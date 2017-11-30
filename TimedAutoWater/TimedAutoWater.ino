@@ -1,6 +1,14 @@
 /* These variables store the flash pattern and the current state of the LED
  https:learn.adafruit.com/multi-tasking-the-arduino-part-1/now-for-two-at-once
 
+
+setup: 
+Arduino mega
+LED Pin: 13
+A2 off time
+A3 on time 
+
+
 positions: 
 Freq: 
 0: prime (ON) 
@@ -18,7 +26,7 @@ Amp:
 */
 
 int ledPin =  13;  //ATMega
-int ledState = HIGH;  //ledState used to set the LED
+int ledState = LOW;  //ledState used to set the LED
 int freqREAD = A3;  //(pin 2, U pattern) 
 int ampREAD = A2; // (pin 3) 
 
@@ -38,7 +46,7 @@ void setup()
   pinMode(freqREAD, INPUT);
   pinMode(ampREAD, INPUT);
 //  set state to pump off
-  ledState = HIGH;
+  ledState = LOW;
   digitalWrite(ledPin, ledState);
   OnTime = 0UL;
   OffTime = 2000UL;
@@ -57,16 +65,21 @@ void loop()
 void TimedBlink1() {
   //check to see if it's time to change the state of the LED
   unsigned long currentMillis = millis();
-  Serial.println(" T1 currentMillis - previousMillis");
+  Serial.println("  ");
+  Serial.print("currentMillis:  ");
   Serial.println((currentMillis));
+  Serial.print("previoustMillis:  ");
   Serial.println((previousMillis));
+  Serial.print(("currentMillis - previousMillis:  "));
   Serial.println((currentMillis - previousMillis));
+  Serial.print("OnTime:  ");
   Serial.println((OnTime));
   Serial.println("  ");
   
-  if ((ledState == LOW) && ((currentMillis - previousMillis) >= OnTime))
+  if ((ledState == HIGH) && ((currentMillis - previousMillis) >= OnTime))
   {
-//    ledState = HIGH;   Turn it off
+    ledState = LOW;   //Turn it off
+    Serial.println("                                                  LOW");
     previousMillis = currentMillis; //  Remember the time
     digitalWrite(ledPin, ledState); //  Update the actual LED
     Serial.println("                                                off");
@@ -75,17 +88,21 @@ void TimedBlink1() {
   
 void TimedBlink2() {
   unsigned long currentMillis = millis();
-  Serial.println(" T2 currentMillis - previousMillis");
+  Serial.print("currentMillis:  ");
   Serial.println((currentMillis));
+  Serial.print("previousMillis:  ");
   Serial.println((previousMillis));
+  Serial.print(("currentMillis - previousMillis  "));
   Serial.println((currentMillis - previousMillis));
+  Serial.print("Off Time:  ");
   Serial.println((OffTime));
   Serial.println("  ");
   Serial.println("  ");
 
-  if ((ledState == HIGH) && ((currentMillis - previousMillis) >= OffTime))
+  if ((ledState == LOW) && ((currentMillis - previousMillis) >= OffTime))
   {
-    ledState = LOW; //  turn it on
+    ledState = HIGH; //  turn it on
+    Serial.println("                                                  HIGH");
     previousMillis = currentMillis; //   Remember the time
     digitalWrite(ledPin, ledState);  //   Update the actual LED
     Serial.println("                                                  on");
@@ -103,16 +120,16 @@ void UpdateEveryXms( unsigned long REFRESH_INTERVAL){
 
 void UpdateFreqAmp() {
   OffTime = analogRead(freqREAD);
-  Serial.println("* OffTime : ");
+  Serial.print("* OffTime : ");
   Serial.println(OffTime);
   
   OnTime = analogRead(ampREAD);
-   Serial.println("* OnTime : ");
+   Serial.print("* OnTime : ");
   Serial.println(OnTime);
   Serial.println();
   
   if (OffTime < 70) {
-    OffTime = 1UL;
+    OffTime = 0UL;
     Serial.println("OFcase1");
   }
   else if ((350 > OffTime) && (OffTime  >= 70)) {
